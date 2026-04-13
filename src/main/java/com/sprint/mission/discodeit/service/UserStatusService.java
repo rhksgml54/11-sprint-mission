@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.dto.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -11,9 +12,9 @@ public interface UserStatusService {
 
   UserStatus create(UserStatusCreateRequest request);
 
-  UserStatus find(UUID userStatusId);
+  UserStatusDto find(UUID userStatusId);
 
-  List<UserStatus> findAll();
+  List<UserStatusDto> findAll();
 
   UserStatus update(UUID userStatusId, UserStatusUpdateRequest request);
 
