@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.api;
 
+import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
@@ -81,7 +82,7 @@ public interface MessageApi {
           content = @Content(array = @ArraySchema(schema = @Schema(implementation = Message.class)))
       )
   })
-  ResponseEntity<List<Message>> findAllByChannelId(
+  ResponseEntity<List<MessageDto>> findAllByChannelId(
       @Parameter(description = "조회할 Channel ID") UUID channelId
   );
 } 

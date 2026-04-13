@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
@@ -7,6 +8,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -29,6 +31,7 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final MessageMapper messageMapper;
 
   @Override
   @Transactional
@@ -62,14 +65,17 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public Message find(UUID messageId) {
+  public MessageDto find(UUID messageId) {
     return messageRepository.findById(messageId)
+            .map(messageMapper::toDto)
             .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
   }
 
   @Override
-  public List<Message> findAllByChannelId(UUID channelId) {
-    return messageRepository.findAllByChannelId(channelId).stream().toList();
+  public List<MessageDto> findAllByChannelId(UUID channelId) {
+    return messageRepository.findAllByChannelId(channelId).stream()
+            .map(messageMapper::toDto)
+            .toList();
   }
 
   @Override
