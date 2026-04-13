@@ -88,23 +88,23 @@ public class FileMessageRepository implements MessageRepository {
   public List<Message> findAllByChannelId(UUID channelId) {
     try (Stream<Path> paths = Files.list(DIRECTORY)) {
       return paths
-          .filter(path -> path.toString().endsWith(EXTENSION))
-          .map(path -> {
-            ReentrantLock lock = fileLockProvider.getLock(path);
-            lock.lock();
-            try (
-                FileInputStream fis = new FileInputStream(path.toFile());
-                ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-              return (Message) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-              throw new RuntimeException(e);
-            } finally {
-              lock.unlock();
-            }
-          })
-          .filter(message -> message.getChannelId().equals(channelId))
-          .toList();
+              .filter(path -> path.toString().endsWith(EXTENSION))
+              .map(path -> {
+                ReentrantLock lock = fileLockProvider.getLock(path);
+                lock.lock();
+                try (
+                        FileInputStream fis = new FileInputStream(path.toFile());
+                        ObjectInputStream ois = new ObjectInputStream(fis)
+                ) {
+                  return (Message) ois.readObject();
+                } catch (IOException | ClassNotFoundException e) {
+                  throw new RuntimeException(e);
+                } finally {
+                  lock.unlock();
+                }
+              })
+              .filter(message -> message.getChannel().getId().equals(channelId))
+              .toList();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
