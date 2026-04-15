@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +27,7 @@ public class MessageController implements MessageApi {
   private final MessageService messageService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<Message> create(
+  public ResponseEntity<MessageDto> create(
           @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
           @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
@@ -48,18 +47,18 @@ public class MessageController implements MessageApi {
                     .toList())
             .orElse(new ArrayList<>());
 
-    Message createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+    MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
     return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(createdMessage);
   }
 
   @PatchMapping(path = "{messageId}")
-  public ResponseEntity<Message> update(
+  public ResponseEntity<MessageDto> update(
           @PathVariable("messageId") UUID messageId,
           @RequestBody MessageUpdateRequest request
   ) {
-    Message updatedMessage = messageService.update(messageId, request);
+    MessageDto updatedMessage = messageService.update(messageId, request);
     return ResponseEntity
             .status(HttpStatus.OK)
             .body(updatedMessage);
@@ -71,6 +70,14 @@ public class MessageController implements MessageApi {
     return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
             .build();
+  }
+
+  @GetMapping(path = "{messageId}")
+  public ResponseEntity<MessageDto> find(@PathVariable("messageId") UUID messageId) {
+    MessageDto message = messageService.find(messageId);
+    return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(message);
   }
 
   @GetMapping

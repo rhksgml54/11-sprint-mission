@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,32 +17,36 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   public BinaryContent create(BinaryContentCreateRequest request) {
     String fileName = request.fileName();
     byte[] bytes = request.bytes();
     String contentType = request.contentType();
+
     BinaryContent binaryContent = new BinaryContent(
-        fileName,
-        (long) bytes.length,
-        contentType,
-        bytes
+            fileName,
+            (long) bytes.length,
+            contentType
     );
-    return binaryContentRepository.save(binaryContent);
+
+    BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+    binaryContentStorage.put(savedBinaryContent.getId(), bytes);
+
+    return savedBinaryContent;
   }
 
   @Override
   public BinaryContent find(UUID binaryContentId) {
     return binaryContentRepository.findById(binaryContentId)
-        .orElseThrow(() -> new NoSuchElementException(
-            "BinaryContent with id " + binaryContentId + " not found"));
+            .orElseThrow(() ->
+                    new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found"));
   }
 
   @Override
-  public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-    return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
-        .toList();
+  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    return binaryContentRepository.findAllByIdIn(ids);
   }
 
   @Override

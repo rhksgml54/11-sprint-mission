@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
+    private final BinaryContentStorage binaryContentStorage;
     private final UserMapper userMapper;
 
     @Override
@@ -57,10 +59,13 @@ public class BasicUserService implements UserService {
                     BinaryContent binaryContent = new BinaryContent(
                             fileName,
                             (long) bytes.length,
-                            contentType,
-                            bytes
+                            contentType
                     );
-                    return binaryContentRepository.save(binaryContent);
+
+                    BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+                    binaryContentStorage.put(savedBinaryContent.getId(), bytes);
+
+                    return savedBinaryContent;
                 })
                 .orElse(null);
 
@@ -87,7 +92,8 @@ public class BasicUserService implements UserService {
                             .orElse(null);
                     return userMapper.toDto(user, online);
                 })
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+                .orElseThrow(() ->
+                        new NoSuchElementException("User with id " + userId + " not found"));
     }
 
     @Override
@@ -110,15 +116,20 @@ public class BasicUserService implements UserService {
             Optional<BinaryContentCreateRequest> optionalProfileCreateRequest
     ) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+                .orElseThrow(() ->
+                        new NoSuchElementException("User with id " + userId + " not found"));
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
 
-        if (newEmail != null && !newEmail.equals(user.getEmail()) && userRepository.existsByEmail(newEmail)) {
+        if (newEmail != null
+                && !newEmail.equals(user.getEmail())
+                && userRepository.existsByEmail(newEmail)) {
             throw new IllegalArgumentException("User with email " + newEmail + " already exists");
         }
-        if (newUsername != null && !newUsername.equals(user.getUsername())
+
+        if (newUsername != null
+                && !newUsername.equals(user.getUsername())
                 && userRepository.existsByUsername(newUsername)) {
             throw new IllegalArgumentException("User with username " + newUsername + " already exists");
         }
@@ -136,10 +147,13 @@ public class BasicUserService implements UserService {
                     BinaryContent binaryContent = new BinaryContent(
                             fileName,
                             (long) bytes.length,
-                            contentType,
-                            bytes
+                            contentType
                     );
-                    return binaryContentRepository.save(binaryContent);
+
+                    BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+                    binaryContentStorage.put(savedBinaryContent.getId(), bytes);
+
+                    return savedBinaryContent;
                 })
                 .orElse(user.getProfile());
 
@@ -151,7 +165,8 @@ public class BasicUserService implements UserService {
     @Transactional
     public void delete(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+                .orElseThrow(() ->
+                        new NoSuchElementException("User with id " + userId + " not found"));
 
         if (user.getProfile() != null) {
             binaryContentRepository.deleteById(user.getProfile().getId());

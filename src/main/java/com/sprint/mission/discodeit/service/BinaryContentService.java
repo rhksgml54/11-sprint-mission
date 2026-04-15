@@ -12,7 +12,7 @@ public interface BinaryContentService {
 
   BinaryContent find(UUID binaryContentId);
 
-  List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds);
+  List<BinaryContent> findAllByIdIn(List<UUID> ids);
 
   void delete(UUID binaryContentId);
 }

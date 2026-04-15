@@ -24,15 +24,18 @@ public interface UserStatusApi {
     @Operation(summary = "User 상태 생성")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "201", description = "User 상태가 성공적으로 생성됨",
+                    responseCode = "201",
+                    description = "User 상태가 성공적으로 생성됨",
                     content = @Content(schema = @Schema(implementation = UserStatus.class))
             ),
             @ApiResponse(
-                    responseCode = "404", description = "User를 찾을 수 없음",
+                    responseCode = "404",
+                    description = "User를 찾을 수 없음",
                     content = @Content(examples = @ExampleObject(value = "User with id {userId} not found"))
             ),
             @ApiResponse(
-                    responseCode = "400", description = "이미 User 상태가 존재함",
+                    responseCode = "400",
+                    description = "이미 User 상태가 존재함",
                     content = @Content(examples = @ExampleObject(value = "UserStatus with userId {userId} already exists"))
             )
     })
@@ -43,11 +46,13 @@ public interface UserStatusApi {
     @Operation(summary = "User 상태 단건 조회")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200", description = "User 상태 조회 성공",
+                    responseCode = "200",
+                    description = "User 상태 조회 성공",
                     content = @Content(schema = @Schema(implementation = UserStatusDto.class))
             ),
             @ApiResponse(
-                    responseCode = "404", description = "User 상태를 찾을 수 없음",
+                    responseCode = "404",
+                    description = "User 상태를 찾을 수 없음",
                     content = @Content(examples = @ExampleObject(value = "UserStatus with id {userStatusId} not found"))
             )
     })
@@ -58,7 +63,8 @@ public interface UserStatusApi {
     @Operation(summary = "User 상태 목록 조회")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200", description = "User 상태 목록 조회 성공",
+                    responseCode = "200",
+                    description = "User 상태 목록 조회 성공",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserStatusDto.class)))
             )
     })
@@ -67,11 +73,13 @@ public interface UserStatusApi {
     @Operation(summary = "User 상태 수정")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200", description = "User 상태가 성공적으로 수정됨",
+                    responseCode = "200",
+                    description = "User 상태가 성공적으로 수정됨",
                     content = @Content(schema = @Schema(implementation = UserStatus.class))
             ),
             @ApiResponse(
-                    responseCode = "404", description = "User 상태를 찾을 수 없음",
+                    responseCode = "404",
+                    description = "User 상태를 찾을 수 없음",
                     content = @Content(examples = @ExampleObject(value = "UserStatus with id {userStatusId} not found"))
             )
     })
@@ -84,7 +92,8 @@ public interface UserStatusApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "User 상태가 성공적으로 삭제됨"),
             @ApiResponse(
-                    responseCode = "404", description = "User 상태를 찾을 수 없음",
+                    responseCode = "404",
+                    description = "User 상태를 찾을 수 없음",
                     content = @Content(examples = @ExampleObject(value = "UserStatus with id {userStatusId} not found"))
             )
     })

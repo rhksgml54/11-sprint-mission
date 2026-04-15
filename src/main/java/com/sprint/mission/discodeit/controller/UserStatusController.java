@@ -22,6 +22,7 @@ public class UserStatusController implements UserStatusApi {
     private final UserStatusService userStatusService;
 
     @PostMapping
+    @Override
     public ResponseEntity<UserStatus> create(@RequestBody UserStatusCreateRequest request) {
         UserStatus createdUserStatus = userStatusService.create(request);
         return ResponseEntity
@@ -30,6 +31,7 @@ public class UserStatusController implements UserStatusApi {
     }
 
     @GetMapping(path = "{userStatusId}")
+    @Override
     public ResponseEntity<UserStatusDto> find(@PathVariable("userStatusId") UUID userStatusId) {
         UserStatusDto userStatus = userStatusService.find(userStatusId);
         return ResponseEntity
@@ -38,6 +40,7 @@ public class UserStatusController implements UserStatusApi {
     }
 
     @GetMapping
+    @Override
     public ResponseEntity<List<UserStatusDto>> findAll() {
         List<UserStatusDto> userStatuses = userStatusService.findAll();
         return ResponseEntity
@@ -46,6 +49,7 @@ public class UserStatusController implements UserStatusApi {
     }
 
     @PatchMapping(path = "{userStatusId}")
+    @Override
     public ResponseEntity<UserStatus> update(
             @PathVariable("userStatusId") UUID userStatusId,
             @RequestBody UserStatusUpdateRequest request
@@ -57,6 +61,7 @@ public class UserStatusController implements UserStatusApi {
     }
 
     @DeleteMapping(path = "{userStatusId}")
+    @Override
     public ResponseEntity<Void> delete(@PathVariable("userStatusId") UUID userStatusId) {
         userStatusService.delete(userStatusId);
         return ResponseEntity

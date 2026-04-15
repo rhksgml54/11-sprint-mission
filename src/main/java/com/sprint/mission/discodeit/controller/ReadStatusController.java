@@ -22,6 +22,7 @@ public class ReadStatusController implements ReadStatusApi {
   private final ReadStatusService readStatusService;
 
   @PostMapping
+  @Override
   public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request) {
     ReadStatus createdReadStatus = readStatusService.create(request);
     return ResponseEntity
@@ -29,7 +30,26 @@ public class ReadStatusController implements ReadStatusApi {
             .body(createdReadStatus);
   }
 
+  @GetMapping(path = "{readStatusId}")
+  @Override
+  public ResponseEntity<ReadStatusDto> find(@PathVariable("readStatusId") UUID readStatusId) {
+    ReadStatusDto readStatus = readStatusService.find(readStatusId);
+    return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(readStatus);
+  }
+
+  @GetMapping
+  @Override
+  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
+    List<ReadStatusDto> readStatuses = readStatusService.findAllByUserId(userId);
+    return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(readStatuses);
+  }
+
   @PatchMapping(path = "{readStatusId}")
+  @Override
   public ResponseEntity<ReadStatus> update(
           @PathVariable("readStatusId") UUID readStatusId,
           @RequestBody ReadStatusUpdateRequest request
@@ -40,11 +60,12 @@ public class ReadStatusController implements ReadStatusApi {
             .body(updatedReadStatus);
   }
 
-  @GetMapping
-  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
-    List<ReadStatusDto> readStatuses = readStatusService.findAllByUserId(userId);
+  @DeleteMapping(path = "{readStatusId}")
+  @Override
+  public ResponseEntity<Void> delete(@PathVariable("readStatusId") UUID readStatusId) {
+    readStatusService.delete(readStatusId);
     return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(readStatuses);
+            .status(HttpStatus.NO_CONTENT)
+            .build();
   }
 }

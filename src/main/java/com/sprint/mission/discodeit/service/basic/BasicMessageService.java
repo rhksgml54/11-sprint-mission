@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,11 +32,12 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
   private final MessageMapper messageMapper;
 
   @Override
   @Transactional
-  public Message create(
+  public MessageDto create(
           MessageCreateRequest messageCreateRequest,
           List<BinaryContentCreateRequest> binaryContentCreateRequests
   ) {
@@ -43,32 +45,42 @@ public class BasicMessageService implements MessageService {
     UUID authorId = messageCreateRequest.authorId();
 
     Channel channel = channelRepository.findById(channelId)
-            .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " does not exist"));
+            .orElseThrow(() ->
+                    new NoSuchElementException("Channel with id " + channelId + " does not exist"));
 
     User author = userRepository.findById(authorId)
-            .orElseThrow(() -> new NoSuchElementException("Author with id " + authorId + " does not exist"));
+            .orElseThrow(() ->
+                    new NoSuchElementException("Author with id " + authorId + " does not exist"));
 
     List<BinaryContent> attachments = binaryContentCreateRequests.stream()
             .map(attachmentRequest -> {
+              byte[] bytes = attachmentRequest.bytes();
+
               BinaryContent binaryContent = new BinaryContent(
                       attachmentRequest.fileName(),
-                      (long) attachmentRequest.bytes().length,
-                      attachmentRequest.contentType(),
-                      attachmentRequest.bytes()
+                      (long) bytes.length,
+                      attachmentRequest.contentType()
               );
-              return binaryContentRepository.save(binaryContent);
+
+              BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+              binaryContentStorage.put(savedBinaryContent.getId(), bytes);
+
+              return savedBinaryContent;
             })
             .toList();
 
     Message message = new Message(messageCreateRequest.content(), channel, author, attachments);
-    return messageRepository.save(message);
+    Message savedMessage = messageRepository.save(message);
+
+    return messageMapper.toDto(savedMessage);
   }
 
   @Override
   public MessageDto find(UUID messageId) {
     return messageRepository.findById(messageId)
             .map(messageMapper::toDto)
-            .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+            .orElseThrow(() ->
+                    new NoSuchElementException("Message with id " + messageId + " not found"));
   }
 
   @Override
@@ -80,18 +92,21 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
-  public Message update(UUID messageId, MessageUpdateRequest request) {
+  public MessageDto update(UUID messageId, MessageUpdateRequest request) {
     Message message = messageRepository.findById(messageId)
-            .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+            .orElseThrow(() ->
+                    new NoSuchElementException("Message with id " + messageId + " not found"));
+
     message.update(request.newContent());
-    return message;
+    return messageMapper.toDto(message);
   }
 
   @Override
   @Transactional
   public void delete(UUID messageId) {
     Message message = messageRepository.findById(messageId)
-            .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+            .orElseThrow(() ->
+                    new NoSuchElementException("Message with id " + messageId + " not found"));
     messageRepository.deleteById(message.getId());
   }
 }

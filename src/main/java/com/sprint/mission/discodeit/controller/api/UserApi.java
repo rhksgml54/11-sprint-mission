@@ -108,4 +108,22 @@ public interface UserApi {
       @Parameter(description = "상태를 변경할 User ID") UUID userId,
       @Parameter(description = "변경할 User 온라인 상태 정보") UserStatusUpdateRequest request
   );
+
+    @Operation(summary = "User 단건 조회")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User 조회 성공",
+                    content = @Content(schema = @Schema(implementation = UserDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User를 찾을 수 없음",
+                    content = @Content(examples = @ExampleObject(value = "User with id {userId} not found"))
+            )
+    })
+    ResponseEntity<UserDto> find(
+            @Parameter(description = "조회할 User ID") UUID userId
+    );
+
 }

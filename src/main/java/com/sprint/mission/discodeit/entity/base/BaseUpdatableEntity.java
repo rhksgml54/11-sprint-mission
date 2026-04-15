@@ -13,14 +13,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.Instant;
 
 @Getter
-@SuperBuilder
 @NoArgsConstructor
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseUpdatableEntity extends BaseEntity {
 
     @LastModifiedDate
-    @Column(name = "update_at")
+    @Column(name = "updated_at")
     protected Instant updatedAt;
 
 }
