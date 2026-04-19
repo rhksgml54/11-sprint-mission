@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -38,24 +36,28 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
-  public Channel create(PublicChannelCreateRequest request) {
+  public ChannelDto create(PublicChannelCreateRequest request) {
     Channel channel = new Channel(ChannelType.PUBLIC, request.name(), request.description());
-    return channelRepository.save(channel);
+    Channel saved = channelRepository.save(channel);
+    return channelMapper.toDto(saved, List.of(), Instant.MIN);
   }
 
   @Override
   @Transactional
-  public Channel create(PrivateChannelCreateRequest request) {
+  public ChannelDto create(PrivateChannelCreateRequest request) {
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     Channel createdChannel = channelRepository.save(channel);
 
-    request.participantIds().stream()
+    List<UUID> participantIds = request.participantIds().stream()
             .map(userId -> userRepository.findById(userId)
                     .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " does not exist")))
-            .map(user -> new ReadStatus(user, createdChannel, createdChannel.getCreatedAt()))
-            .forEach(readStatusRepository::save);
+            .map(user -> {
+              readStatusRepository.save(new ReadStatus(user, createdChannel, createdChannel.getCreatedAt()));
+              return user.getId();
+            })
+            .toList();
 
-    return createdChannel;
+    return channelMapper.toDto(createdChannel, participantIds, Instant.MIN);
   }
 
   @Override
@@ -82,7 +84,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
-  public Channel update(UUID channelId, PublicChannelUpdateRequest request) {
+  public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
     Channel channel = channelRepository.findById(channelId)
             .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
 
@@ -91,7 +93,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     channel.update(request.newName(), request.newDescription());
-    return channel;
+    return toDto(channel);
   }
 
   @Override
@@ -106,10 +108,8 @@ public class BasicChannelService implements ChannelService {
   }
 
   private ChannelDto toDto(Channel channel) {
-    Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
-            .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
-            .map(Message::getCreatedAt)
-            .findFirst()
+    Instant lastMessageAt = messageRepository.findTopByChannelIdOrderByCreatedAtDesc(channel.getId())
+            .map(message -> message.getCreatedAt())
             .orElse(Instant.MIN);
 
     List<UUID> participantIds = new ArrayList<>();

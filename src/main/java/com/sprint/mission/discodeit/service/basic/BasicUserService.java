@@ -23,6 +23,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -36,7 +37,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
-    public User create(
+    public UserDto create(
             UserCreateRequest userCreateRequest,
             Optional<BinaryContentCreateRequest> optionalProfileCreateRequest
     ) {
@@ -80,18 +81,14 @@ public class BasicUserService implements UserService {
         UserStatus userStatus = new UserStatus(createdUser, Instant.now());
         userStatusRepository.save(userStatus);
 
-        return createdUser;
+        return userMapper.toDto(createdUser, userStatus.isOnline());
     }
 
     @Override
     public UserDto find(UUID userId) {
         return userRepository.findById(userId)
-                .map(user -> {
-                    Boolean online = userStatusRepository.findByUserId(user.getId())
-                            .map(UserStatus::isOnline)
-                            .orElse(null);
-                    return userMapper.toDto(user, online);
-                })
+                .map(user -> userMapper.toDto(user,
+                        user.getUserStatus() != null ? user.getUserStatus().isOnline() : null))
                 .orElseThrow(() ->
                         new NoSuchElementException("User with id " + userId + " not found"));
     }
@@ -99,18 +96,14 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserDto> findAll() {
         return userRepository.findAll().stream()
-                .map(user -> {
-                    Boolean online = userStatusRepository.findByUserId(user.getId())
-                            .map(UserStatus::isOnline)
-                            .orElse(null);
-                    return userMapper.toDto(user, online);
-                })
+                .map(user -> userMapper.toDto(user,
+                        user.getUserStatus() != null ? user.getUserStatus().isOnline() : null))
                 .toList();
     }
 
     @Override
     @Transactional
-    public User update(
+    public UserDto update(
             UUID userId,
             UserUpdateRequest userUpdateRequest,
             Optional<BinaryContentCreateRequest> optionalProfileCreateRequest
@@ -158,7 +151,8 @@ public class BasicUserService implements UserService {
                 .orElse(user.getProfile());
 
         user.update(newUsername, newEmail, userUpdateRequest.newPassword(), nullableProfile);
-        return user;
+        return userMapper.toDto(user,
+                user.getUserStatus() != null ? user.getUserStatus().isOnline() : null);
     }
 
     @Override
@@ -172,7 +166,6 @@ public class BasicUserService implements UserService {
             binaryContentRepository.deleteById(user.getProfile().getId());
         }
 
-        userStatusRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
     }
 }

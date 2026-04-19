@@ -4,11 +4,13 @@ import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -16,11 +18,15 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -28,12 +34,15 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class BasicMessageService implements MessageService {
 
+  private static final int MESSAGE_PAGE_SIZE = 50;
+
   private final MessageRepository messageRepository;
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final MessageMapper messageMapper;
+  private final PageResponseMapper pageResponseMapper;
 
   @Override
   @Transactional
@@ -84,10 +93,17 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<MessageDto> findAllByChannelId(UUID channelId) {
-    return messageRepository.findAllByChannelId(channelId).stream()
-            .map(messageMapper::toDto)
-            .toList();
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, int page) {
+    Pageable pageable = PageRequest.of(
+            page,
+            MESSAGE_PAGE_SIZE,
+            Sort.by(Sort.Direction.DESC, "createdAt")
+    );
+
+    Slice<Message> messageSlice = messageRepository.findAllByChannelId(channelId, pageable);
+    Slice<MessageDto> dtoSlice = messageSlice.map(messageMapper::toDto);
+
+    return pageResponseMapper.toDto(dtoSlice);
   }
 
   @Override
@@ -104,9 +120,9 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional
   public void delete(UUID messageId) {
-    Message message = messageRepository.findById(messageId)
-            .orElseThrow(() ->
-                    new NoSuchElementException("Message with id " + messageId + " not found"));
-    messageRepository.deleteById(message.getId());
+    if (!messageRepository.existsById(messageId)) {
+      throw new NoSuchElementException("Message with id " + messageId + " not found");
+    }
+    messageRepository.deleteById(messageId);
   }
 }
