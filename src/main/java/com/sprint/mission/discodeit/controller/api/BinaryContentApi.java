@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller.api;
 
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,10 +22,10 @@ public interface BinaryContentApi {
             @ApiResponse(
                     responseCode = "201",
                     description = "파일 메타정보가 성공적으로 생성됨",
-                    content = @Content(schema = @Schema(implementation = BinaryContent.class))
+                    content = @Content(schema = @Schema(implementation = BinaryContentDto.class))
             )
     })
-    ResponseEntity<BinaryContent> create(
+    ResponseEntity<BinaryContentDto> create(
             @Parameter(description = "생성할 파일 메타정보") BinaryContentCreateRequest request
     );
 
@@ -34,7 +34,7 @@ public interface BinaryContentApi {
             @ApiResponse(
                     responseCode = "200",
                     description = "파일 메타정보 조회 성공",
-                    content = @Content(schema = @Schema(implementation = BinaryContent.class))
+                    content = @Content(schema = @Schema(implementation = BinaryContentDto.class))
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -42,7 +42,7 @@ public interface BinaryContentApi {
                     content = @Content(examples = @ExampleObject(value = "BinaryContent with id {binaryContentId} not found"))
             )
     })
-    ResponseEntity<BinaryContent> find(
+    ResponseEntity<BinaryContentDto> find(
             @Parameter(description = "조회할 파일 ID") UUID binaryContentId
     );
 

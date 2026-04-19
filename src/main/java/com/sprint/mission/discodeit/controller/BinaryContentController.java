@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +18,19 @@ import java.util.UUID;
 public class BinaryContentController implements BinaryContentApi {
 
   private final BinaryContentService binaryContentService;
-  private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentStorage binaryContentStorage;
 
   @PostMapping
-  public ResponseEntity<BinaryContent> create(@RequestBody BinaryContentCreateRequest request) {
-    BinaryContent createdBinaryContent = binaryContentService.create(request);
+  public ResponseEntity<BinaryContentDto> create(@RequestBody BinaryContentCreateRequest request) {
+    BinaryContentDto createdBinaryContent = binaryContentService.create(request);
     return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(createdBinaryContent);
   }
 
   @GetMapping(path = "{binaryContentId}")
-  public ResponseEntity<BinaryContent> find(@PathVariable("binaryContentId") UUID binaryContentId) {
-    BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+  public ResponseEntity<BinaryContentDto> find(@PathVariable("binaryContentId") UUID binaryContentId) {
+    BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
     return ResponseEntity
             .status(HttpStatus.OK)
             .body(binaryContent);
@@ -41,8 +38,7 @@ public class BinaryContentController implements BinaryContentApi {
 
   @GetMapping(path = "{binaryContentId}/download")
   public ResponseEntity<?> download(@PathVariable("binaryContentId") UUID binaryContentId) {
-    BinaryContent binaryContent = binaryContentService.find(binaryContentId);
-    BinaryContentDto binaryContentDto = binaryContentMapper.toDto(binaryContent);
+    BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
     return binaryContentStorage.download(binaryContentDto);
   }
 
