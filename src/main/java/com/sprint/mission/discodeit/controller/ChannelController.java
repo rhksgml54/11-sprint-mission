@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,8 +23,8 @@ public class ChannelController implements ChannelApi {
 
   @PostMapping("/public")
   @Override
-  public ResponseEntity<Channel> create(PublicChannelCreateRequest request) {
-    Channel createdChannel = channelService.create(request);
+  public ResponseEntity<ChannelDto> create(PublicChannelCreateRequest request) {
+    ChannelDto createdChannel = channelService.create(request);
     return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(createdChannel);
@@ -33,8 +32,8 @@ public class ChannelController implements ChannelApi {
 
   @PostMapping("/private")
   @Override
-  public ResponseEntity<Channel> create(PrivateChannelCreateRequest request) {
-    Channel createdChannel = channelService.create(request);
+  public ResponseEntity<ChannelDto> create(PrivateChannelCreateRequest request) {
+    ChannelDto createdChannel = channelService.create(request);
     return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(createdChannel);
@@ -60,11 +59,11 @@ public class ChannelController implements ChannelApi {
 
   @PatchMapping("/public/{channelId}")
   @Override
-  public ResponseEntity<Channel> update(
+  public ResponseEntity<ChannelDto> update(
           @PathVariable("channelId") UUID channelId,
           @RequestBody PublicChannelUpdateRequest request
   ) {
-    Channel updatedChannel = channelService.update(channelId, request);
+    ChannelDto updatedChannel = channelService.update(channelId, request);
     return ResponseEntity
             .status(HttpStatus.OK)
             .body(updatedChannel);

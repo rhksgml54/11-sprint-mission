@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.entity.Channel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -27,10 +26,10 @@ public interface ChannelApi {
             @ApiResponse(
                     responseCode = "201",
                     description = "Public Channel 생성 성공",
-                    content = @Content(schema = @Schema(implementation = Channel.class))
+                    content = @Content(schema = @Schema(implementation = ChannelDto.class))
             )
     })
-    ResponseEntity<Channel> create(
+    ResponseEntity<ChannelDto> create(
             @Parameter(description = "Public Channel 생성 정보") PublicChannelCreateRequest request
     );
 
@@ -39,10 +38,10 @@ public interface ChannelApi {
             @ApiResponse(
                     responseCode = "201",
                     description = "Private Channel 생성 성공",
-                    content = @Content(schema = @Schema(implementation = Channel.class))
+                    content = @Content(schema = @Schema(implementation = ChannelDto.class))
             )
     })
-    ResponseEntity<Channel> create(
+    ResponseEntity<ChannelDto> create(
             @Parameter(description = "Private Channel 생성 정보") PrivateChannelCreateRequest request
     );
 
@@ -80,7 +79,7 @@ public interface ChannelApi {
             @ApiResponse(
                     responseCode = "200",
                     description = "Channel 수정 성공",
-                    content = @Content(schema = @Schema(implementation = Channel.class))
+                    content = @Content(schema = @Schema(implementation = ChannelDto.class))
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -93,7 +92,7 @@ public interface ChannelApi {
                     content = @Content(examples = @ExampleObject(value = "Private channel cannot be updated"))
             )
     })
-    ResponseEntity<Channel> update(
+    ResponseEntity<ChannelDto> update(
             @Parameter(description = "수정할 Channel ID") UUID channelId,
             @Parameter(description = "수정할 Public Channel 정보") PublicChannelUpdateRequest request
     );
