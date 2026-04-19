@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller.api;
 import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.dto.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -26,7 +25,7 @@ public interface UserStatusApi {
             @ApiResponse(
                     responseCode = "201",
                     description = "User 상태가 성공적으로 생성됨",
-                    content = @Content(schema = @Schema(implementation = UserStatus.class))
+                    content = @Content(schema = @Schema(implementation = UserStatusDto.class))
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -39,7 +38,7 @@ public interface UserStatusApi {
                     content = @Content(examples = @ExampleObject(value = "UserStatus with userId {userId} already exists"))
             )
     })
-    ResponseEntity<UserStatus> create(
+    ResponseEntity<UserStatusDto> create(
             @Parameter(description = "User 상태 생성 정보") UserStatusCreateRequest request
     );
 
@@ -75,7 +74,7 @@ public interface UserStatusApi {
             @ApiResponse(
                     responseCode = "200",
                     description = "User 상태가 성공적으로 수정됨",
-                    content = @Content(schema = @Schema(implementation = UserStatus.class))
+                    content = @Content(schema = @Schema(implementation = UserStatusDto.class))
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -83,7 +82,7 @@ public interface UserStatusApi {
                     content = @Content(examples = @ExampleObject(value = "UserStatus with id {userStatusId} not found"))
             )
     })
-    ResponseEntity<UserStatus> update(
+    ResponseEntity<UserStatusDto> update(
             @Parameter(description = "수정할 UserStatus ID") UUID userStatusId,
             @Parameter(description = "수정할 User 상태 정보") UserStatusUpdateRequest request
     );

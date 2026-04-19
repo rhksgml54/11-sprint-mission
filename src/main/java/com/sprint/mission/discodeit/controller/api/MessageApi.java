@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller.api;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,8 +22,9 @@ public interface MessageApi {
             @Parameter(description = "조회할 메시지 ID") UUID messageId
     );
 
-    ResponseEntity<List<MessageDto>> findAllByChannelId(
-            @Parameter(description = "조회할 채널 ID") UUID channelId
+    ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+            @Parameter(description = "조회할 채널 ID") UUID channelId,
+            @Parameter(description = "페이지 번호") int page
     );
 
     ResponseEntity<MessageDto> update(

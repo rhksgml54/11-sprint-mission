@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.controller.api.UserStatusApi;
 import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.dto.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,8 +22,8 @@ public class UserStatusController implements UserStatusApi {
 
     @PostMapping
     @Override
-    public ResponseEntity<UserStatus> create(@RequestBody UserStatusCreateRequest request) {
-        UserStatus createdUserStatus = userStatusService.create(request);
+    public ResponseEntity<UserStatusDto> create(@RequestBody UserStatusCreateRequest request) {
+        UserStatusDto createdUserStatus = userStatusService.create(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(createdUserStatus);
@@ -50,11 +49,11 @@ public class UserStatusController implements UserStatusApi {
 
     @PatchMapping(path = "{userStatusId}")
     @Override
-    public ResponseEntity<UserStatus> update(
+    public ResponseEntity<UserStatusDto> update(
             @PathVariable("userStatusId") UUID userStatusId,
             @RequestBody UserStatusUpdateRequest request
     ) {
-        UserStatus updatedUserStatus = userStatusService.update(userStatusId, request);
+        UserStatusDto updatedUserStatus = userStatusService.update(userStatusId, request);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(updatedUserStatus);
