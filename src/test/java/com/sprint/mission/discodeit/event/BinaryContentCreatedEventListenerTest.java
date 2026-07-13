@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.event;
 
+import com.sprint.mission.discodeit.entity.BinaryContentStatus;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,9 @@ public class BinaryContentCreatedEventListenerTest {
     @Mock
     private BinaryContentStorage binaryContentStorage;
 
+    @Mock
+    private BinaryContentService binaryContentService;
+
     @InjectMocks
     private BinaryContentCreatedEventListener binaryContentCreatedEventListener;
 
@@ -32,5 +37,6 @@ public class BinaryContentCreatedEventListenerTest {
         binaryContentCreatedEventListener.on(event);
 
         verify(binaryContentStorage).put(eq(binaryContentId), eq(bytes));
+        verify(binaryContentService).updateStatus(eq(binaryContentId), eq(BinaryContentStatus.SUCCESS));
     }
 }
