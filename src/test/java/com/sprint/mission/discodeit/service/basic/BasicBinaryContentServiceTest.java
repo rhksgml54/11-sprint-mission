@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentStatus;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
@@ -145,6 +146,17 @@ class BasicBinaryContentServiceTest {
 
     // then
     assertThat(result).containsExactly(dto1, dto2);
+  }
+
+  @Test
+  @DisplayName("바이너리 콘텐츠 상태 변경 성공")
+  void updateStatus_Success() {
+
+    given(binaryContentRepository.findById(eq(binaryContentId))).willReturn(Optional.of(binaryContent));
+
+    binaryContentService.updateStatus(binaryContentId, BinaryContentStatus.SUCCESS);
+
+    assertThat(binaryContent.getStatus()).isEqualTo(BinaryContentStatus.SUCCESS);
   }
 
   @Test
