@@ -20,6 +20,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -141,6 +142,7 @@ class BasicMessageServiceTest {
     assertThat(result).isEqualTo(messageDto);
     verify(messageRepository).save(any(Message.class));
     verify(applicationEventPublisher).publishEvent(any(BinaryContentCreatedEvent.class));
+    verify(applicationEventPublisher).publishEvent(any(MessageCreatedEvent.class));
   }
 
   @Test
