@@ -10,5 +10,7 @@ public interface NotificationService {
 
     NotificationDto find(UUID notificationId);
 
+    NotificationDto create(String title, String content, UUID receiverId);
+
     void delete(UUID notificationId);
 }
