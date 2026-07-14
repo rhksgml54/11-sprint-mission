@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "Notification", description = "알림 API")
 public interface NotificationApi {
@@ -32,5 +33,23 @@ public interface NotificationApi {
     ResponseEntity<List<NotificationDto>> findAll(
             @Parameter(hidden = true) @AuthenticationPrincipal
             DiscodeitUserDetails userDetails
+    );
+
+    @Operation(summary = "알림 확인(삭제)")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204", description = "알림 확인 성공"),
+            @ApiResponse(
+                    responseCode = "401", description = "인증되지 않은 요청"
+            ),
+            @ApiResponse(
+                    responseCode = "403", description = "본인의 알림이 아님"
+            ),
+            @ApiResponse(
+                    responseCode = "404", description = "알림을 찾을 수 없음"
+            )
+    })
+    ResponseEntity<Void> delete(
+            @Parameter(description = "확인할 알림 ID") UUID notificationId
     );
 }
