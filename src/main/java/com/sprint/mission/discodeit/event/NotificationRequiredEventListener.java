@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -22,6 +23,7 @@ public class NotificationRequiredEventListener {
     private final ReadStatusRepository readStatusRepository;
     private final NotificationService notificationService;
 
+    @Async
     @TransactionalEventListener
     public void on(MessageCreatedEvent event) {
         log.debug("메시지 생성 알림 처리 시작: messageId={}", event.message().id());
@@ -41,6 +43,7 @@ public class NotificationRequiredEventListener {
         log.info("메시지 생성 알림 처리 완료: messageId={}", event.message().id());
     }
 
+    @Async
     @TransactionalEventListener
     public void on(RoleUpdatedEvent event) {
         log.debug("권한 변경 알림 처리 시작: userId={}", event.userId());
